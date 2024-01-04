@@ -119,7 +119,8 @@ Imagine we've been hired to work on an application that keeps track of friendshi
 * Add friendships between people (edges between nodes). These will be unweighted and undirected.
 * Remove nodes from the social network. Some people may want to revoke their accounts.
 * Remove edges from the social network. Sadly, some people may want to end their friendships.
-This graph will not be a `connected` graph. A connected graph is one where a potential path exists between every single node in the graph. However, in an actual social network, we can't assume that everyone knows each other. Our social network could look like this:
+
+This graph will not be a **connected** graph. A connected graph is one where a potential path exists between every single node in the graph. However, in an actual social network, we can't assume that everyone knows each other. Our social network could look like this:
 
 ![connected graph](https://drive.google.com/uc?export=view&id=12czLDEhaSf7Ta7GEHHBPO5b20gicKBPj)
 
@@ -130,3 +131,26 @@ In the image above, Ada, Grace and Eve are friends. However, no one in this grou
 You can probably imagine all kinds of ways to build this application out further. Imagine, for instance, that we decided to weight edges based on the number of social interactions between two nodes. We could then determine their overall connectivity (and perhaps even make assumptions about how close they are as friends). And you can likely also imagine all kinds of other use cases for graphs besides social networks ranging from transportation networks to HR applications to business applications tracking international trade.
 
 In the next lesson, we'll actually start building our application.
+
+## Building Graphs - Part 2
+We are going to keep this application very simple. In fact, our nodes will just be strings. That way, we can focus entirely on building a `Graph` class without worrying about a `Node` class.
+
+So let's think about the simplest possible behavior our `Graph` class should have. We should be able to instantiate a graph with an empty data structure where we will store information about nodes and edges. So which data structure should we use?
+
+Remember, we have three options:
+
+* Edge list
+* Adjacency list
+* Adjacency matrix
+
+We aren't going to do an edge list because honestly, it's not that great for searching. We'd have to look through the entire collection of pairs just to see a list of someone's friends. That's not very efficient.
+
+That leaves an adjacency list or an adjacency matrix. We are going to use an adjacency list for a number of reasons. First, we can store additional data in an adjacency list (such as information about nodes and edges). We won't do that here, but it's an advantage that an adjacency list has over an adjacency matrix.
+
+An adjacency list is also more efficient than an adjacency matrix for checking a node's adjacent nodes - and in the context of this application, that means it's more efficient for looking at a list of someone's friends. That is a pretty important operation. Why is it more efficient? Well, finding adjacent nodes is an O(N) search for both adjacency lists and adjacency matrices. However, with an adjacency list, we just need to iterate over a list of adjacent nodes (in this case, a list of someone's friends). In the case of an adjacency matrix, we'd need to iterate over all nodes - that is, everyone in the application, and check to see if each person is a friend or not. So imagine if our application has a million users. We want to see a list of Jasmine's friends. (She has fifty friends in the application in all.) It makes much more sense to iterate through a list of those fifty friends to see them than to iterate through all one million users, checking to see if each is a friend or not.
+
+Now that we've decided to use an adjacency list, we know that when we instantiate a `Graph`, it should come with an empty adjacency list.
+
+We are going to use a `Map` to store this list. While we could keep things very simple and just use a JavaScript object, there are performance advantages to using a `Map` - and we can easily use a Map's built-in methods to add nodes and edges to our adjacency list. What are the performance advantages? Well, for one thing, a `Map` uses a hash table lookup algorithm under the hood. The ES6 specs guarantee at least an average of **sub-linear** complexity for `Map` implementations. But what does that mean? Well, sub-linear complexity means that the Big O needs to be better than linear time (O(N)), so that could be something like O(1) constant time or O(log n) logarithmic time.
+
+Meanwhile, if we used an object instead, we'd need to iterate through the object - and object iteration isn't optimized already, which means we'd have a Big O of O(N). So iterating through objects is slower.
