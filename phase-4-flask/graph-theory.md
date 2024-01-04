@@ -330,5 +330,99 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
     this.adjacencyList.get(node2).add(node1);
     }
     ```
+
+  * ### Checking to See if a Node Exists
+    We could just do something like the following whenever we want to see if an edge (in this case, a friendship) exists:
+
+    ```
+    graph.adjacencyList.get("Ada").has("Jasmine")
+    ```
+
+    This would check to see if Ada and Jasmine are friends.
+
+    However, this is pretty important functionality for our application to have. That means we should add it.
+
+    Let's start with the easiest behavior - just returning `false`.
+
+    *`__tests__/graph.test.js`*
+
+    ```
+    ...
+    test('check to see if edge exists in graph', () => {
+        graph.addNode("Jasmine");
+        graph.addNode("Ada");
+        expect(graph.hasEdge("Jasmine", "Ada")).toEqual(false);
+    });
+    ...
+    ```
+
+    Here's the implementation:
+
+    *`src/graph.js`*
+
+    ```
+    ...
+    hasEdge(node1, node2) {
+        return false;
+    }
+    ...
+    ```
+
+    Now that we have that test passing, we're ready to move on. Typically, we won't update tests we've already written but we are going to make an exception here.
+
+    We will update the following test to use our new method:
+
+    *`__tests__/graph.test.js`*
+
+    ```
+    ...
+    test('add an edge between two nodes', () => {
+        graph.addNode("Jasmine");
+        graph.addNode("Ada");
+        graph.createEdge("Jasmine", "Ada");
+        expect(graph.adjacencyList.get("Jasmine").has("Ada")).toEqual(true);
+        expect(graph.adjacencyList.get("Ada").has("Jasmine")).toEqual(true);
+    });
+    ...
+    ```
+
+    Instead of expecting `graph.adjacencyList.get("Ada").has("Jasmine")` to equal true, why not just apply our new method instead?
+
+    Our updated test looks like this:
+
+    *`__tests__/graph.test.js`*
+
+    ```
+    ...
+    test('add an edge between two nodes', () => {
+        graph.addNode("Jasmine");
+        graph.addNode("Ada");
+        graph.createEdge("Jasmine", "Ada");
+        expect(graph.hasEdge("Ada", "Jasmine")).toEqual(true);
+    });
+    ...
+    ```
+
+    As we can see here, we now expect `graph.hasEdge("Ada", "Jasmine")).toEqual(true);`.
+
+    This test will fail - let's update our `Graph.prototype.hasEdge()` method now:
+
+    *`src/graph.js`*
+
+    ```
+    ...
+    hasEdge(node1, node2) {
+        if (this.adjacencyList.get(node1).has(node2)) {
+        return true
+        }
+        return false;
+    }
+    ...
+    ```
+
+    Because this is an undirected graph, it doesn't matter which way we check the relationship - each node is adjacent to the other node. So we just check that the set associated with the `node1` key includes `node2`. If it does, our method will return true.
+
+    That's all we need to get all our tests passing.
+
     
 
