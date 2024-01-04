@@ -157,7 +157,8 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
 
   * ### Instantiating a Graph
     Our first check will make sure that we can correctly instantiate a new graph with an empty adjacency list:
-    __tests__/graph.test.js
+
+    *`__tests__/graph.test.js`*
     ```
     import Graph from '../src/graph.js';
 
@@ -180,7 +181,7 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
 
     Here's the code to get this passing:
 
-    src/graph.js
+    *`src/graph.js`*
     ```
     export default class Graph {
     constructor() {
@@ -194,7 +195,7 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
 
     Here's our new test: 
 
-    \__tests\__/graph.test.js 
+    *`__tests__/graph.test.js`*
     ```
     ...
     test('should add a new node', () => {
@@ -211,7 +212,7 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
 
     Here's the code we need to pass our test:
 
-    src/graph.js
+    *`src/graph.js`*
     ```
     export default class Graph {
     ...
@@ -222,3 +223,60 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
     ```
 
     As we can see, the implementation is simple. We use ```Map.prototype.set()``` to add a key-value pair to our ```adjacencyList```. The key will be the name of the node we are adding and the value will be an empty Set.
+
+  * ### Checking to See if Nodes Exist
+    What's the next behavior we should implement? Well, we need to know whether a node exists in our graph or not. That means the next step is to add a Graph.prototype.hasNode() method. The simplest behavior for this method will be to return false if the node doesn't exist in the adjacency list.
+
+    Here's a test:
+
+    *`__tests__/graph.test.js`*
+
+    ```
+    ...
+    test('should return false if the node does not exist in the adjacency list', () => {
+        expect(graph.hasNode("Ada")).toEqual(false);
+    });
+    ...
+    ```
+    And here's the minimum code in a `Graph.prototype.getNode()` method to get this test passing:
+
+    *`src/graph.js`*
+    ```
+    ...
+    hasNode(name) {
+        return false;
+    }
+    ...
+    ```
+    Now we need to write a test for when a node does exist in a graph:
+
+    *`__tests__/graph.test.js`*
+
+    ```
+    ...
+    test('check to see if node exists in graph', () => {
+        graph.addNode("Jasmine");
+        expect(graph.hasNode("Jasmine")).toEqual(true);
+    });
+    ...
+    ```
+
+    To get this test passing, we can use a method that a Map's prototype offers. Here's the update to our method:
+
+    *`src/graph.js`*
+    ```
+    ...
+    hasNode(name) {
+        if (this.adjacencyList.get(name)) {
+        return true;
+        }
+        return false;
+    }
+    ...
+    ```
+
+    We take advantage of `Map.prototype.get()`, which either returns a value of a key in a map or returns undefined if the key doesn't exist. Here's a situation where our code is already more efficient because we are using maps instead of just iterating through a basic object. To check if our graph has a node, we need to do a search. Because we are using `Map.prototype.get()` instead of looping through an array or object, calling this method has sub-linear complexity instead of linear complexity (O(N)).
+
+    Now that we've added all the basic functionality for nodes other than removing nodes, which we'll get to later, we're ready to start adding functionality for edges.
+
+
