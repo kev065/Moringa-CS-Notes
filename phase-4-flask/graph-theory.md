@@ -188,3 +188,37 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
     }
     }
     ```
+
+  * ### Creating Nodes
+    What's the next thing we need to do? Well, we need to be able to add people to our social network. People are the equivalent of nodes in a graph. We'll keep our methods sufficiently abstract so they pertain more to creating graphs in general than building social networks more specifically. For that reason, we'll add a ```Graph.prototype.addNode()``` method, not a ```Graph.prototype.addFriend()``` method.
+
+    Here's our new test: 
+
+    \__tests\__/graph.test.js 
+    ```
+    ...
+    test('should add a new node', () => {
+        graph.addNode("Jasmine");
+        expect(graph.adjacencyList.get("Jasmine").size).toEqual(0);
+    });
+    ...
+    ```
+    We should be able to add a node via a ```Graph.prototype.addNode()``` method. We don't have a ```Graph.prototype.getNode()``` method yet so we can't use that for our expectations. For that reason, we'll just access the node via the graph's ```adjacencyList```. Since the ```adjacencyList``` is a ```Map```, we can use ```Map.prototype.get()``` to get the value associated with the key. Why are we looking for a ```size``` property again once we get the value related to Jasmine? Well, each key in our adjacency list will be a ```Set```.
+
+    A ```Set``` is a collection of entirely unique values. Jasmine and Ada can be friends only once - not three times - so we want to make sure that a node can occur in the collection only once. That's where using a JavaScript ```Set``` comes in handy.
+
+    Once again, the ES6 specifications guarantee that ```Set``` implementations generally have sub-linear complexity - so Sets are also pretty efficient and much better than using a collection like an array.
+
+    Here's the code we need to pass our test:
+
+    src/graph.js
+    ```
+    export default class Graph {
+    ...
+    addNode(name) {
+        this.adjacencyList.set(name, new Set());
+    }
+    }
+    ```
+
+    As we can see, the implementation is simple. We use ```Map.prototype.set()``` to add a key-value pair to our ```adjacencyList```. The key will be the name of the node we are adding and the value will be an empty Set.
