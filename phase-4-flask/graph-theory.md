@@ -154,3 +154,37 @@ Now that we've decided to use an adjacency list, we know that when we instantiat
 We are going to use a `Map` to store this list. While we could keep things very simple and just use a JavaScript object, there are performance advantages to using a `Map` - and we can easily use a Map's built-in methods to add nodes and edges to our adjacency list. What are the performance advantages? Well, for one thing, a `Map` uses a hash table lookup algorithm under the hood. The ES6 specs guarantee at least an average of **sub-linear** complexity for `Map` implementations. But what does that mean? Well, sub-linear complexity means that the Big O needs to be better than linear time (O(N)), so that could be something like O(1) constant time or O(log n) logarithmic time.
 
 Meanwhile, if we used an object instead, we'd need to iterate through the object - and object iteration isn't optimized already, which means we'd have a Big O of O(N). So iterating through objects is slower.
+
+  * ### Instantiating a Graph
+    Our first check will make sure that we can correctly instantiate a new graph with an empty adjacency list:
+    __tests__/graph.test.js
+    ```
+    import Graph from '../src/graph.js';
+
+    describe('Graph', () => {
+
+      let graph = new Graph();
+
+      afterEach(() => {
+        graph = new Graph();
+      });
+
+      test('should correctly instantiate a graph', () => {
+        expect(graph.adjacencyList.size).toEqual(0);
+      });
+    });
+    ```
+    Note that we start by instantiating a new graph and also add an `afterEach()` block to reset the graph after each test. It's overkill for just one test but it will DRY up future tests.
+
+    In the test itself, we `expect(graph.adjacencyList.size).toEqual(0)`. Maps have a `size` property, which means we can just check to see if our graph's `adjacencyList` has a `size` property that's equal to zero (an empty map).
+
+    Here's the code to get this passing:
+
+    src/graph.js
+    ```
+    export default class Graph {
+    constructor() {
+        this.adjacencyList = new Map();
+    }
+    }
+    ```
