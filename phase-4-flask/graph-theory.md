@@ -1,11 +1,12 @@
 # GRAPH THEORY
-Objectives
-To learn what a graph is and how it is used.
-To implement the graph abstract data type using multiple internal representations.
-To see how graphs can be used to solve a wide variety of problems
+## Objectives
+* To learn what a graph is and how it is used.
+* To implement the graph abstract data type using multiple internal representations.
+* To see how graphs can be used to solve a wide variety of problems.
+
 In this chapter we will study graphs. Graphs are a more general structure than the trees we studied in the last chapter; in fact you can think of a tree as a special kind of graph. Graphs can be used to represent many interesting things about our world, including systems of roads, airline flights from city to city, how the Internet is connected, or even the sequence of classes you must take to complete a major in computer science. We will see in this chapter that once we have a good representation for a problem, we can use some standard graph algorithms to solve what otherwise might seem to be a very difficult problem.
 
-Graphs
+## Graphs
 In computer science, a graph (also known as a network) is a collection of nodes (also known as vertices) and edges (also known as links or relations). We can think of nodes as things while the edges describe the relationships between those things. The study of graphs is known as graph theory and it fits into the larger field of network theory, which is useful for understanding everything from social networks to databases.
 
 We've actually been working with graphs a lot already. That's because the tree data structures we learned in the last section are graphs with additional rules. We'll talk about this more soon.
@@ -26,5 +27,5 @@ We also take advantage of graph theory every time we use a mapping application l
 
 In order to find the fastest route, Google Maps will calculate the shortest distance between the first node (your position) and the last node (destination). As you might guess, the edges need to be weighted so that the actual distance between each node can be determined. It's common to use algorithms to determine the shortest path between two nodes. It's also common to use algorithms to determine the reachability of a node. 
 
-Graph theory can get much more complex than the basics we cover here. Check out this
-short videoLinks [short video](https://www.youtube.com/watch?v=82zlRaRUsaY/) on graph theory which provides a nice overview.However, we now know enough to move onto the next step: representing graphs with code.
+Graph theory can get much more complex than the basics we cover here. Check out this [short video] [! [Watch the video] (https://img.youtube.com/vi/82zlRaRUsaY/hqdefault.jpg)] (https://www.youtube.com/embed/82zlRaRUsaY/)
+ on graph theory which provides a nice overview. However, we now know enough to move onto the next step: representing graphs with code.
