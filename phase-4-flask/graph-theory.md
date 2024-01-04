@@ -424,5 +424,38 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
 
     That's all we need to get all our tests passing.
 
-    
+  * ### Removing Edges
+    We should also be able to remove an edge as well - no more friendship, sadly…
 
+    Here's the test:
+
+    *`__tests__/graph.test.js`*
+
+    ```
+    ...
+    test('remove an edge between two nodes', () => {
+        graph.addNode("Jasmine");
+        graph.addNode("Ada");
+        graph.createEdge("Jasmine", "Ada");
+        graph.removeEdge("Jasmine", "Ada");
+        expect(graph.hasEdge("Ada", "Jasmine")).toEqual(false);
+    });
+    ```
+
+    In this test, we first create two nodes and add an edge. Next, we'll call `graph.removeEdge("Jasmine", "Ada");`. Based on removing that edge, our expectation should show that there's no longer an edge between the Ada and Jasmine nodes.
+
+    Now let's get this test passing:
+
+    *`src/graph.js`*
+
+    ```
+    ...
+    removeEdge(node1, node2) {
+        this.adjacencyList.get(node1).delete(node2);
+        this.adjacencyList.get(node2).delete(node1);
+    }
+    ...
+    ```
+
+    Because this is an undirected graph, both nodes include the other node in their set of adjacent nodes. That means we need to remove `node1` from `node2`'s adjacent nodes and vice versa. Here's another situation where having sub-linear complexity benefits us. If we were doing our own implementation with objects and arrays, we'd need to do an O(N) search to get a node and then another O(N) search to find the node to delete. Removing the node from the array would then shift all the remaining indexes of the array - yet another O(N) operation. Then we'd do that all over again going in the other direction. While O(6N) still boils down to O(N), it should be clear that having more efficient code can really help us in the long run, especially if our datasets get especially large.
+    
