@@ -524,3 +524,51 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
     At this point, we have everything in place to add and remove nodes and edges from our graph application. We can also check to see if a node or edge exists in the adjacency list and we can return all of a node's edges.
 
     The next step is to learn about traversing our graph - and that means applying BFS and DFS - breadth-first search and depth-first search algorithms. We will start learning about these algorithms in the next lesson.
+
+## Stacks and Queues
+In this lesson, we're going to learn about **stacks** and **queues**. We'll start by covering a brief overview of each. Then we'll write basic stack and queue functions.
+
+Stacks and queues are both data structures that hold a list of elements. However, there is a key difference in how they work. A queue is **first in, first out** or **FIFO**. On the other hand, a stack is **last in, first out** or **LIFO**.
+
+Let's use some examples of how both the FIFO and LIFO principles apply in our daily lives.
+
+* When we get in a line (at the grocery store checkout counter, to go to a movie, or anything else), we expect the first person in line to get served first and so on. This is a prime example of FIFO.
+* On the other hand, let's say we are reorganizing and stacking books from a bookshelf one at a time. When we take a book off the stack, we will most likely take it off the top of the stack, not the bottom. This is an example of LIFO because the last book added to the stack is the first one that's taken off the stack.
+
+There are plenty of examples in computer programming where we'll use queues and stacks as well. For instance, waiting to download something and others are queued to download that thing first.
+
+When it comes to stacks, we work with the JavaScript call stack every time we write JavaScript code. We can see this clearly in the following example:
+
+```
+function first() {
+  return second();
+}
+
+function second() {
+  return third();
+}
+
+function third() {
+  return "hello!"
+}
+```
+
+When we call `first()`, what happens? `first()` calls `second()` which calls `third()`. But which one is actually resolved first? Well, `first()` can't be resolved until `second()` is - and `second()` can't be resolved until `third()` is. How can the `first()` function ultimately return `"hello!"` unless the `third()` function resolves first?
+
+This is the stack:
+
+```
+TOP OF THE STACK
+
+third()
+second()
+first()
+
+BOTTOM OF THE STACK
+```
+
+The technical term for each function is a stack is a **frame**. Whenever a function is called in the JavaScript runtime (the time our code is actually executed), the runtime creates a stack frame for that function. There is a limit to that stack - which you've probably noticed if you've ever run an infinite loop by accident and received a `Range error: maximum call stack size exceeded` error.
+
+By the way, if you are confused about what the runtime is, in the Chrome browser or in Node (JavaScript backend environment) the runtime is the V8 engine.
+
+And when it comes to queues, we are actually working with a queue every time we run async JavaScript code in the browser. The browser actually uses separate web APIs to run async code and when that async code is ready to run (such as when a response from an API is received), that code is actually put in a `callback` queue which is not the call stack. So our synchronous code is put on the call stack (LIFO) while our asynchronous code is queued up in the callback queue (FIFO). Meanwhile, an event loop determines whether to run code from the call stack or the callback queue. You don't need to have a deep understanding of this to work with JavaScript. 
