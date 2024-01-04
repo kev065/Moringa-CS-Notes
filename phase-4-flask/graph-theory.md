@@ -27,7 +27,7 @@ We also take advantage of graph theory every time we use a mapping application l
 
 In order to find the fastest route, Google Maps will calculate the shortest distance between the first node (your position) and the last node (destination). As you might guess, the edges need to be weighted so that the actual distance between each node can be determined. It's common to use algorithms to determine the shortest path between two nodes. It's also common to use algorithms to determine the reachability of a node. 
 
-Graph theory can get much more complex than the basics we cover here. Check out this [short video](https://www.youtube.com/watch?v=82zlRaRUsaY/) on graph theory which provides a nice overview. However, we now know enough to move onto the next step: representing graphs with code.
+Graph theory can get much more complex than the basics we cover here. Check out this short [video](https://www.youtube.com/watch?v=82zlRaRUsaY/) on graph theory which provides a nice overview. However, we now know enough to move onto the next step: representing graphs with code.
 
 ## Representing Graph Structures With Code
 In the last lesson, we learned about the basics of graph theory and looked at a few visual representations of graphs. While visualizing graphs is very useful, as we've learned from working with tree structures, we can't simply apply visualization to code. For instance, a search tree isn't actually a tree in code - even though we can depict it that way on a piece of paper. Instead, a search tree is simply a series of nodes where the parent nodes have references to their children.
@@ -74,3 +74,40 @@ So how do we represent the edges? There are several ways to do this.
     }
     ```
     In this adjacency list, `Wobox` can't reach any nodes but `Cyra` can reach `Wobox`.
+
+  * ## Adjacency Matrix
+    Finally, we can use an adjacency matrix to depict all the edges in a graph. An adjacency matrix uses a series of zeroes and ones or booleans to depict whether two nodes are adjacent or not.
+
+    Here's how this looks organized in a table.
+
+    |   | Lub | Zygob | Cyra | Nu | Wobox |
+    |:--:|:--:|:--:|:--:|:--:|:--:|
+    | Lub | 0 | 0 | 0 | 1 | 0 |
+    | Zygob | 0 | 0 | 0 | 1 | 0 |  
+    | Cyra | 0 | 0 | 0 | 0 | 1 |
+    | Nu | 1 | 1 | 0 | 0 | 1 |
+    | Wobox | 0 | 0 | 1 | 1 | 0 |
+
+    To depict this in JavaScript, we'd use nested arrays to represent each row in the matrix:
+    ```
+    const adjacencyMatrix = [
+    [0, 0, 0, 1, 0],
+    [0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 1],
+    [1, 1, 0, 0, 1],
+    [0, 0, 1, 1, 0],
+    ];
+    ```
+    It may seem silly to represent a planet's relationship with itself in an adjacency matrix. However, there is a type of graph known as a multigraph where nodes can have multiple edges - including an edge that starts and ends at the same node. For example, a multigraph could look like this (some planets omitted for simplicity).
+
+    ![multigraph](https://drive.google.com/uc?export=view&id=1f2KyB-Hv8gmPpMdkhu6k904HoBSqg6QI)
+
+    For this reason, it makes sense that an adjacency matrix also checks to see if an edge connects a node to itself.
+
+    Note that an adjacency matrix can also be used to show directed edges. For instance, the intersection of the row `Cyra` with the column `Wobox` could have a value of 1 while the intersection of the row `Wobox` with the column `Cyra` could be 0. Then the trip to `Wobox` would be one way after all.
+
+    If we want to see whether two nodes are adjacent in an adjacency matrix, we can do so in constant time O(1). For instance, in order to check if `Lub` and `Nu` are adjacent, we simply need to check `adjacencyMatrix[0][3]`. In other words, we just need to find the intersection of a specific column and row in the matrix.
+
+    However, there's also a downside. Adjacency matrices can take up a lot of space, especially when considering sparse graphs. A graph is sparse if it doesn't have very many edges in relation to nodes. Why does this matter in terms of an adjacency matrix? Well, look at all the zeroes in the matrix above. We have to store information about the relationship between every pair of nodes in the graph - even if they don't have an edge between them. That's a lot of empty space that doesn't exist in either an edge list or an adjacency list.
+
+    Also, if we want to find all the edges that the row `Cyra` has, we need to do a linear search of the entire row. Many of those values could be zeroes, so in a large data set, we are searching a lot of elements just to find a few adjacent nodes - especially in a sparse graph. Meanwhile, in an adjacency list, all the values corresponding to a node would represent adjacent nodes so there are fewer values to iterate through to get all the adjacent nodes.
