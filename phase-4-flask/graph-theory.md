@@ -458,4 +458,69 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
     ```
 
     Because this is an undirected graph, both nodes include the other node in their set of adjacent nodes. That means we need to remove `node1` from `node2`'s adjacent nodes and vice versa. Here's another situation where having sub-linear complexity benefits us. If we were doing our own implementation with objects and arrays, we'd need to do an O(N) search to get a node and then another O(N) search to find the node to delete. Removing the node from the array would then shift all the remaining indexes of the array - yet another O(N) operation. Then we'd do that all over again going in the other direction. While O(6N) still boils down to O(N), it should be clear that having more efficient code can really help us in the long run, especially if our datasets get especially large.
-    
+
+  * ### Removing Nodes
+    Finally, let's add some functionality for removing nodes. We saved this for last since it's a bit more complex than the functionality we've built so far. That's because it's not as simple as just deleting a node. We also need to delete all references to that node in the rest of the adjacency list. In the context of a social network application, when we remove a person from the app, everyone else that's friends with that person will no longer have them listed as a friend because it's only possible to be friends with someone who is also on the app.
+
+    Let’s first write a test:
+
+    *`_tests_/graph.test.js`*
+
+    ```
+    ...
+    test('should delete a node and all of its adjacent nodes', () => {
+        graph.addNode("Ada");
+        graph.addNode("Jasmine");
+        graph.addNode("Lydia");
+        graph.createEdge("Ada", "Jasmine");
+        graph.createEdge("Ada", "Lydia");
+        graph.removeNode("Ada");
+        expect(graph.hasNode("Ada")).toEqual(false);
+        expect(graph.hasEdge("Jasmine", "Ada")).toEqual(false);
+        expect(graph.hasEdge("Lydia", "Ada")).toEqual(false);
+    });
+    ...
+    ```
+
+    This is a pretty wordy test (and at some point, it would be good to look at ways to DRY our tests further). First, we need to add three nodes and then create edges between our first node and the others. Why are we doing this? Well, we want to make sure that we are correctly removing all edges that refer to the deleted node. We also have three expectations - which is on the heavy side. Ideally, we'd break this test up into a few smaller behaviors (just deleting a node first before testing to see if edges were successfully removed), but we're doing it all in one test here.
+
+    We expect the node we've deleted to be gone. However, we still have two other nodes that have references to the deleted node - so we also expect those references to be gone as well.
+
+    Let's implement the method now:
+
+    *`src/graph.js`*
+
+    ```
+    ...
+    removeNode(name) {
+        if (this.adjacencyList.has(name)) {
+        this.adjacencyList.get(name).forEach((edge) => {
+            this.adjacencyList.get(edge).delete(name);
+        });
+        this.adjacencyList.delete(name);
+        }
+    }
+    ...
+    ```
+
+    First, we check if the node we want to delete exists as a key in the adjacency list (`(this.adjacencyList.has(name))`). Based on our test, the node represents Ada which exists in our graph.
+
+    Next, we call `this.adjacencyList.get(name)`. This is the Set of edges associated with the node we want to delete. In the case of Ada, the edges (or friendships) are Jasmine and Lydia.
+
+    For each edge, we need to do the following: `this.adjacencyList.get(edge).delete(name);`. So for our first edge (Jasmine), we grab the key associated with Jasmine and then remove Ada from her friendships. Next, we do the same with the second edge (Lydia). We grab the key associated with Lydia and then remove Ada from her friendships, too.
+
+    At this point, we've removed all of the edges related to Ada in other nodes. The last step is to delete the node itself - in this case, Ada, removing her entirely from the application.
+
+    A few other things to note here. We use arrow notation (`=>`) so that `this.adjacencyList` remains bound to the same `this` both inside and outside the loop. If it weren't for `=>`, the `this` inside the loop would lose its binding and be `undefined`.
+
+    So what is the runtime complexity of this algorithm? It's hard to pinpoint exactly without fully knowing everything JavaScript is doing to optimize sets and maps under the hood. However, we can make some educated guesses.
+
+    * `this.adjacencyList.has(name)` has sublinear complexity. We know that maps use hash tables under the hood. This may be close to O(1) lookup.
+    * Looping through the set of adjacent nodes is O(N), which is typical with basic loops.
+    * Inside the loop, we need to get an edge and remove it - which depending on how ES6 implements deleting items from a set, is at least sublinear complexity and possibly even close to O(1).
+
+    On the other hand, imagine that we implemented our own basic functionality where we needed to first iterate through the set of adjacent nodes and then had to iterate again through each node's adjacent nodes to find which one needed to be deleted. That would be O(AB), which isn't so great. (It would not be O(n²) because the nested loop iterates over a different set in the outer loop.)
+
+    At this point, we have everything in place to add and remove nodes and edges from our graph application. We can also check to see if a node or edge exists in the adjacency list and we can return all of a node's edges.
+
+    The next step is to learn about traversing our graph - and that means applying BFS and DFS - breadth-first search and depth-first search algorithms. We will start learning about these algorithms in the next lesson.
