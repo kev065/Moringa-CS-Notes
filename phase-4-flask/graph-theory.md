@@ -279,4 +279,56 @@ Meanwhile, if we used an object instead, we'd need to iterate through the object
 
     Now that we've added all the basic functionality for nodes other than removing nodes, which we'll get to later, we're ready to start adding functionality for edges.
 
+  * ### Adding Edges
+    At this point, we have methods to add nodes to a graph and to see whether a node exists in our graph. The next step is to add functionality to add relationships between nodes.
+
+    In other words, we need to be able to add edges, which means we need a `Graph.prototype.createEdge()` method.
+
+    As always, we'll start with a test:
+
+    *`__tests__/graph.test.js`*
+    ```
+    ...
+    test('add an edge between two nodes', () => {
+        graph.addNode("Jasmine");
+        graph.addNode("Ada");
+        graph.createEdge("Jasmine", "Ada");
+        expect(graph.adjacencyList.get("Jasmine").has("Ada")).toEqual(true);
+        expect(graph.adjacencyList.get("Ada").has("Jasmine")).toEqual(true);
+    });
+    ...
+    ```
+
+    First, we need to add two nodes to our test. Then we need to create an edge between these two nodes with a `Graph.prototype.createEdge()` method. Note that this test has two expectations. Remember that this is an undirected graph - a friendship goes two ways, not one. That means we need to add each node to the other's adjacency node list. If this were a directed graph, we'd just update one adjacency list - and the order of arguments in our `Graph.prototype.createEdge()` method would matter.
+
+    Note also that we have to do some chaining in our expectations to reach the values we want. We start by using `Map.prototype.get()` to get the value associated with a node, which happens to be a set. Then we use `Set.prototype.has()` to determine whether the set actually has the node we are looking for.
+
+    If the worst-case scenario in terms of Big O is O(N) for both of these operations, that means with chaining we have O(2N) - so still O(N). However, the worst-case will be rare and the average-case will be sub-linear complexity.
+
+    Here's the method to get this test to pass:
+
+    *`src/graph.js`*
+    ```
+    ...
+    createEdge(node1, node2) {
+        let set1 = this.adjacencyList.get(node1);
+        let set2 = this.adjacencyList.get(node2);
+        set1.add(node2);
+        set2.add(node1);
+    }
+    ...
+    ```
+
+    To create an edge, we need information about the nodes we want to create an edge between. That means our method takes two arguments. We need to grab the set associated with each node. Then we need to add each node to the other node's list of adjacent nodes. Remember that because these are sets, we don't need to worry about duplicates - JavaScript will take care of that for us.
+
+    We can also make our method more concise with additional chaining:
+
+    *`src/graph.js`*
+    ```
+    createEdge(node1, node2) {
+    this.adjacencyList.get(node1).add(node2);
+    this.adjacencyList.get(node2).add(node1);
+    }
+    ```
+    
 
