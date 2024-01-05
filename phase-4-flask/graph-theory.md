@@ -1090,5 +1090,108 @@ There are two ways we can search a tree - regardless of whether that's a binary 
     So that is a depth-first search algorithm in a nutshell. We use a stack to search through each branch. In this lesson, we just focused on finding whether a node is reachable. You will get a chance to practice some other implementations soon as well.
 
 
+  * ### Breadth First Algorithms
+    In the last lesson, we used a depth-first algorithm to determine if a target node in our friendship network is reachable from a starting node. In this lesson, we'll test and write a `Graph.prototype.breadthFirstReachable()` method. This method will do the exact same thing as our `Graph.prototype.depthFirstReachable()` method. The only difference is how the method will work. Instead of using a depth-first search, the method will use a breadth-first search.
+
+    This will feel a little bit different than our usual TDD process because we will use the exact same tests that we used in the last lesson. In other words, our tests are already written for us! Go ahead and create a `bfs.test.js` file in `__tests__` with the exact same tests that are in the `dfs.test.js` file. Then update the name of the `Graph.prototype.depthFirstReachable()` method to `Graph.prototype.breadthFirstReachable()`. Our goal here is just to verify that everything in our method works correctly as we won't get tests passing one at a time. That's because the method itself is extremely similar to the one we wrote in the last lesson.
+
+    The only difference is that we'll use a queue instead of a stack. That means each time we add new nodes to traverse, they will go to the end of the queue instead of the top of the stack. We will still evaluate the first element in the collection - but because it's a queue (and new items are being pushed to the end of the queue), this will be first-in, first-out (FIFO) instead of last-in, first-out (LIFO).
+
+    Here's the full updated method:
+
+    *`src/bfs.js`*
+
+      ```
+      breadthFirstReachable(startingNode, targetNode) {
+          if ((!this.adjacencyList.has(startingNode)) || (!this.adjacencyList.has(targetNode))) {
+            return false;
+          }
+          let queue = [startingNode];
+          let traversedNodes = new Set();
+          while (queue.length) {
+            const currentNode = queue.shift();
+            if (currentNode === targetNode) {
+              return true;
+            } else {
+              traversedNodes.add(currentNode);
+              const adjacencyList = this.adjacencyList.get(currentNode);
+              adjacencyList.forEach(function(node) {
+                if (!traversedNodes.has(node)) {
+                  queue.push(node);
+                }
+              });
+            }
+          }
+          return false;
+        }
+      ```
+
+    The first three lines in the method look exactly the same as our previous method:
+
+      ```
+      if ((!this.adjacencyList.has(startingNode)) || (!this.adjacencyList.has(targetNode))) {
+        return false;
+      }
+      ```
+
+    This just ensures that both the `startingNode` and the `targetNode` exist in the graph and will get our first two tests passing. Once again, we don't want the overhead of doing a search algorithm if we can quickly determine whether a node exists in the list or not (which has O(1) time).
+
+    Now let's take a look at the very subtle difference between DFS and BFS:
+
+    *`src/bfs.js`*
+
+      ```
+      ...
+        let queue = [startingNode];
+        let traversedNodes = new Set();
+        while (queue.length) {
+          const currentNode = queue.shift();
+          if (currentNode === targetNode) {
+            return true;
+          } else {
+            traversedNodes.add(currentNode);
+            const adjacencyList = this.adjacencyList.get(currentNode);
+            adjacencyList.forEach(function(node) {
+              if (!traversedNodes.has(node)) {
+                queue.push(node);
+              }
+            });
+          }
+        }
+        return false;
+      }
+      ...
+      ```
+
+    Other than the fact that we changed the name of our collection from stack to queue, there is only one small change in the method. Can you find it?
+
+    The only difference is inside our inner loop when we do the following:
+
+      ```
+      queue.push(node);
+      ```
+
+    Meanwhile, in the last lesson, we did the following instead:
+
+      ```
+      stack.unshift(node);
+      ```
+
+    In both algorithms, we always traverse the first element in the collection each iteration through the loop. The difference is that when we add new elements to the queue, they go to the end of the collection, which means they will be traversed last (a breadth-first search). Meanwhile, with the stack, they go to the beginning of the collection, which means they will be traversed first (a depth-first search).
+
+    That is really the only difference between a DFS and a BFS. Despite that fact, the order at which items are traversed can make a huge impact on the overall efficiency of an algorithm. For instance, if we knew there was a high probability that a node is a friend or a friend of a friend, we probably won't want to do a DFS. Instead, we could just use a BFS to first check all friends and then check all friends of friends.
+
+    Now that we've learned the basics of DFS and BFS, we're well on our way to having a basic understanding of graphs and how we can traverse them. We also have some new problem-solving tools to work with. In addition to our knowledge of two new algorithms (DFS and BFS), we can also see how we can use queues and stacks, two different data structures, to solve different kinds of problems. Whether that is using JavaScript's event loop or writing an algorithm, these data structures are absolutely essential.
+
+    #### Practice
+    Now that we've learned the basics of graph theory, it's time to practice! First, walk through all the examples in the graph theory lessons and code along if you haven't already. Once you are done, you are ready for some additional challenges.
+    * Create an application that shows connections in a **directed** graph. To do this, create an application with ten nodes which are all locations. They could be locations for your hometown, for a mythical realm, or for an imaginary city. First, use [draw.io](https://app.diagrams.net/) to draw your graph. Add nodes that are both one-way and two-way. (There are both one-way and two-way arrows in [draw.io](https://app.diagrams.net/).) Make sure that some nodes are unreachable to others.
+    * Once you have completed your diagram, you will need to make some updates to your code. For instance, the `Graph.prototype.addNode()` method we wrote is undirected. You can update this method or add additional methods such as `Graph.prototype.addDirectedEdge()` and `Graph.prototype.addUndirectedEdge()`. It's up to you to determine how you want to implement a directed graph application. Just make sure to use TDD.
+    * Add a counter to determine how many steps it takes to traverse the entire graph using both BFS and DFS.
+    * **More challenging**: Try writing recursive versions of your DFS and BFS algorithms.
+    * **Difficult**: Write a `Graph.prototype.shortestPath()` method to determine the shortest path between one node and another. The method should return the path (the nodes traversed) to get from the starting node to the targeted node.
+    * Make the edges **weighted**. Each edge should now have a value associated with it that represents the distance between the two nodes. To do this, create an `Edge` class. Each instantiated edge should have a `distance` property. When calculating the shortest path, your `Graph.prototype.shortestPath()` method should take into account these distances.
+    * Finally, create a `Graph.prototype.allPaths()` method that returns all paths - similar to what we might see with an application like Google Maps. Once again, this should return the paths between the starting node and the target node. The difference is that all the potential paths can be returned. Sort these paths from shortest to longest.
+
 
 
