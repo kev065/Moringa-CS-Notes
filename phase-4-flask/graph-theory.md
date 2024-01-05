@@ -726,3 +726,56 @@ There are two ways we can search a tree - regardless of whether that's a binary 
     * If we know that the answer we are looking for will be at the bottom of a tree, a DFS will usually be faster than a BFS. For instance, we might be looking for living descendants of a long family tree - and everyone alive will be at the bottom of the tree.
     * DFS usually takes less memory than BFS.
 
+
+  * ### Breadth-First Search
+    On the other hand, a breadth-first search algorithm searches horizontally. The image below demonstrates this:
+
+    ![binary search tree](https://drive.google.com/uc?export=view&id=17GHfIcsBknYOAb54ChmLKzEzYFQL4urJ)
+
+    As we can see, the algorithm will search each row in the tree completely before moving onto the next one.
+
+    In contrast to a depth-first search, a breadth-first search uses a **queue** instead of a stack. That means that when we add new nodes to the collection, they are added at the end. Meanwhile, we evaluate the node at the beginning of the collection first.
+
+    Once again, let's demonstrate how this works first on the perfect binary search tree in the diagram above and then on our graph of friends.
+
+    Our queue starts like this:
+    ```
+    let queue = [4];
+    ```
+
+    We grab 4 and then add 2 and 6 to the queue.
+    ```
+    queue = [2, 6];
+    ```
+
+    2 is first in line, so let's add its children: 1 and 3. Here's the big difference between the stack we used before and the queue we are using now. We add 1 and 3 to the end of the queue - not to the beginning (or "top") of the stack.
+
+    So now our queue looks like this:
+    ```
+    queue = [6, 1, 3];
+    ```
+
+    We take 6 from the front and add its children (5 and 7) to the queue:
+    ```
+    queue = [1, 3, 5, 7];
+    ```
+
+    As we can see, we've finished an entire "row" of the tree - and all that's left to traverse is the bottom row.
+
+    In this case, we want to check all of Jasmine's friends before we check her friends' friends.
+
+    First, we add all of her friends to an array:
+    ```
+    let queue = ["Ada", "Lydia", "Rose"];
+    ```
+
+    The first friend in the queue is Ada. We remove Ada from the queue and get her friends: Dylan and Lydia. We add them to the end of the queue:
+    ```
+    queue = ["Lydia", "Rose", "Dylan", "Lydia"];
+    ```
+
+    As we can see, the first few names still on the list are the ones that are Jasmine's friends - we save the names we added (friends of friends) to the end of the list. Remember, nodes added to the end of the list always represent going deeper into the tree. If we want to go depth-first, we add elements to the beginning of the collection. If we want to go breadth-first, we add new elements to the end of the collection.
+
+    #### Advantages
+    * If we know that an answer will be close to the root node, a BFS is more efficient. For instance, in the family tree example, we might be looking for a direct descendant that lived 50 years later than the ancestor at the root node, not 300 years later.
+    * BFSs are great for computing the most efficient path between two nodes. For that reason, they are great for GPS and mapping applications and even for finding people near each other in social networks.
