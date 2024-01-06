@@ -148,3 +148,151 @@ We can also convert any number into its binary equivalent with the `Number.proto
 Note that we have to put parentheses around the number or the parser will get confused and throw the following error: `Uncaught SyntaxError: Invalid or unexpected token`.
 
 In the next lesson, we'll learn more about bit manipulation, including JavaScript operators for manipulating bits. In the process, we'll learn about some use cases for bit manipulation in the real world.
+
+
+## Manipulating Bits
+In the last lesson, we learned about bits - the smallest units of binary code that our machines use to operate. In this lesson, we'll learn how to work with bits, including comparing and manipulating them.
+
+Why learn about bit manipulation? While working with binary code might be necessary on the lowest level of the machine, why would we use bits in higher-level languages? Well, it turns out that bits are very useful for a number of different things:
+* **Hashing algorithms**: These algorithms are used to convert a hash into an array and back. They are an essential part of hash tables, which we will cover in a future lesson, and hashing algorithms often use bitwise manipulation. Hashing algorithms are one-way programs, so the text can’t be unscrambled and decoded by anyone else. And that’s the point. Hashing protects data at rest, so even if someone gains access to your server, the items stored there remain unreadable. Eg MD5,SHA-256
+* **Encryption**: Encryption processes use hashing algorithms as well. We can use bitwise manipulation to improve our encryption and make it exceptionally difficult to crack passwords.
+* **Compression**: Bitwise manipulation is often used for compression algorithms. An example is the widely used [zlib](https://www.euccas.me/zlib/) library, which is implemented with Node, Ruby, C#, and many other languages.
+* **Storing boolean values**: We can store multiple boolean values with a minimum amount of data. This is useful for determining read/write permissions and also has other potential applications which we will cover later.
+
+Now that we can see some of the potential use cases for bit manipulation, let's take a look at the bitwise operators we can use in JavaScript. Note that almost all of these bitwise operators are exactly the same in Ruby and C# as well.
+
+| Operator | Name        | Description                                                                                                 |
+|-|-|-
+| &       | AND         | Sets each bit to 1 if both bits are 1                                                                       |  
+| \|      | OR          | Sets each bit to 1 if one of two bits is 1                                                                  |
+| ^       | XOR         | Sets each bit to 1 if only one of two bits is 1                                                             |
+| ~       | NOT         | Inverts all the bits                                                                                        |
+| <<      | Zero fill left shift  | Shifts left by pushing zeros in from the right and let the leftmost bits fall off                            |
+| >>      | Signed right shift | Shifts right by pushing copies of the leftmost bit in from the left, and let the rightmost bits fall off     | 
+| >>>     | Zero fill right shift | Shifts right by pushing zeros in from the left, and let the rightmost bits fall off                          |
+
+### Examples
+
+-----------------------------------------------------------
+
+**Operation**      | **Result** | **Same As** | **Result**
+-|-|-|-
+5 & 1             | 1 | 0101 & 0001     | 0001
+5 \| 1            | 5 | 0101 \| 0001   | 0101  
+~ 5                | 10 | ~ 0101       | 1010
+5 << 1            | 10 | 0101 << 1   | 1010 
+5 ^ 1            | 4 | 0101 ^ 0001    | 0100
+5 >> 1            | 2 | 0101 >> 1   | 0010
+5 >>> 1           | 2 | 0101 >>> 1  | 0010 
+
+JavaScript stores numbers as 64 bits floating point numbers, but all bitwise operations are performed on 32 bits binary numbers. Before a bitwise operation is performed, JavaScript converts numbers to 32 bits signed integers. After the bitwise operation is performed, the result is converted back to 64 bits JavaScript numbers.
+
+In the next lesson, we'll have an opportunity to practice solving some problems using bitwise manipulation.
+
+### Practice
+Now it's time to practice using bitwise manipulation. The problems below are sorted from easiest to hardest. See if you can try solving them with a whiteboard. If not, solving them in VS Code is fine, too.
+
+1. #### Odd or Even Number
+    Write a function that looks at a number's binary representation to determine if it is even or odd.
+
+    **Hint**: Start by writing out 1 to 10 in binary (or even higher if you want to practice). Look for a pattern you can use to determine whether a number is even or odd.
+
+2. #### True Love
+    Paris, a nonbinary princex, is searching all the kingdoms of the land to find another nonbinary princex to marry. To find the right match, Paris's advisors have used the [Myers-Briggs test](https://www.psychologytoday.com/us/basics/myers-briggs) to try to find the best fit. 
+
+    (**Note**: We are not advocating for the Myers-Briggs test in any way - it just lends itself nicely to being written as binary code.) This test looks at four qualities:
+    * Extraversion versus Information
+    * Sensing versus Intuition
+    * Thinking versus Feeling
+    * Judgment versus Perception
+
+    Here's the princex list so far (including Paris):
+
+    ```
+    const princexList = {
+        Paris: {
+            eVsI: "E",
+            sVsI: "S",
+            tVsF: "F",
+            jVsP: "P"
+        },
+        Pat: {
+            eVsI: "I",
+            sVsI: "S",
+            tVsF: "T",
+            jVsP: "P"
+        },
+        Pau: {
+            eVsI: "E",
+            sVsI: "S",
+            tVsF: "T",
+            jVsP: "J"
+        },
+        Pearl: {
+            eVsI: "E",
+            sVsI: "I",
+            tVsF: "T",
+            jVsP: "P"
+        },
+        Puck: {
+            eVsI: "I",
+            sVsI: "S",
+            tVsF: "T",
+            jVsP: "J"
+        },
+        Pluto: {
+            eVsI: "E",
+            sVsI: "S",
+            tVsF: "T",
+            jVsP: "P"
+        },
+        Parker: {
+            eVsI: "I",
+            sVsI: "S",
+            tVsF: "T",
+            jVsP: "J"
+        }
+    }
+    ```
+    That's a lot of data that could be stored much more efficiently - especially since Paris has recently decided to expand their search to all the people in the kingdom - not just people from the princex list above. Since we now have potentially millions of people to search through, our first task is to store all the information about each person in the kingdom into a single binary number instead of a basic object.
+
+    Your first task is to write a function that converts the results of each person's Myers-Briggs test into a series of zeroes and ones.
+
+    For instance, this:
+    ```
+    Paris: {
+      eVsI: "E",
+      sVsI: "S",
+      tVsF: "F",
+      jVsP: "P"
+    }
+    ```
+    Could be converted into this:
+
+    ```
+    ["Paris", 1100]
+    ```
+    This assumes that the first option (extraversion, sensing, thinking, judgment) of each binary Myers-Brigg quality is translated to a 1 while the second option (information, intuition, feeling, perception) is translated to 0.
+
+    Next, translate `princexList` list into an array of arrays called `princexArray`. Each nested array should contain a key (the name of the person) and a value (the results of their Myers-Briggs test in binary code).
+
+    So how much less memory does this `princexArray` take than `princexList`? We can use an NPM library called [object-sizeof](https://www.npmjs.com/package/object-sizeof) to find out. Don't worry, you don't need to use this library in your own code unless you are curious to compare the size of various objects.
+
+    We can use this library to calculate the following:
+    * `princexList` (our basic object) uses 342 bytes.
+    * `princexArray` (our array) uses 126 bytes.
+
+    Note that these savings are mostly due to using an array instead of an object, not because we are using a binary number. Both 1100 and `"ESFP"` use 8 bytes in JavaScript. However, let's say we wanted to compare 16 values instead of 4. A 16-digit number that uses zeroes and ones still takes 8 bytes - while a 16-digit string takes 32 bytes. The savings become more apparent the more boolean values there are to compare. This may not seem like much difference but in very large datasets, it becomes more significant.
+
+    Next, write an algorithm that uses bitwise operators to determine whether a person is a good match for Paris. If three or more values on the Myers-Briggs test are the same, they should be a good match. If all four values are the same, they should be a great match. How you sort this information is up to you.
+
+3. #### Encrypter
+    Next, write a function that encrypts a five-letter string using bitwise manipulation. You will need to use methods that convert letters to numbers and then back to do so. See the [ASCII lesson](https://github.com/kev065/Moringa-CS-Notes/blob/main/phase-4-flask/bit-manipulation-hashing.md#ascii) for a refresher. You may come up with your own implementation, or you may try the one below.
+
+    The encrypter should do the following:
+    * It should do a binary left shift of two for each letter.
+    * Next, it should switch every bit in each binary number to its opposite.
+    * Next, it should do another left shift for each letter, this one of three.
+    * At this point, there should be encrypted binary representations of all five letters. Merge these into one long binary string and then convert it to the decimal number system. The method should return this number.
+
+    Next, try writing a method to decrypt the number back to its original string.
